@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./ERC165.sol";
+import "./interfaces/IERC721.sol";
 
 /*
 1. nft to point to an address.
@@ -10,19 +11,7 @@ import "./ERC165.sol";
 5. Create an event that emits a transfer log - contract address where it
     is being minted to, the id.
 */
-contract ERC721 is ERC165 {
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
-
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
-
+contract ERC721 is ERC165, IERC721 {
     // mapping of owner to token.
     mapping(uint256 => address) private _tokenOwner;
 
@@ -32,7 +21,7 @@ contract ERC721 is ERC165 {
     //approvals
     mapping(uint256 => address) private _tokenApprovals;
 
-    function _exists(uint256 tokenId) internal {
+    function _exists(uint256 tokenId) internal view returns (bool) {
         return _tokenOwner[tokenId] != address(0);
     }
 
@@ -86,6 +75,7 @@ contract ERC721 is ERC165 {
         require(_exists(tokenId));
         address owner = _tokenOwner[tokenId];
         require(spender == owner);
+        return true;
     }
 
     function _transferFrom(
@@ -110,7 +100,7 @@ contract ERC721 is ERC165 {
         address from,
         address to,
         uint256 tokenId
-    ) public {
+    ) public payable {
         // require(isApprovedOrOwner(msg.sender, tokenId));
         _transferFrom(from, to, tokenId);
     }
